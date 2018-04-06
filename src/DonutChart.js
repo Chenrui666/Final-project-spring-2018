@@ -3,24 +3,31 @@ import '../style/style.css';
 
 function DonutChart(_){
 
-	let _value = () => {};
+	//let _value = () => {};
 
-	function exports(data,i){
+	function exports(data){
 		const root = this;
+
+		console.log(this);
+
+		console.log(data);
 
 		const width = root.clientWidth;
 		const height = root.clientHeight;
 		const radius = Math.min(width, height) / 2;
+		const thickness = 20;
 
 		const color = d3.scaleOrdinal(d3.schemeCategory20);
 
-		const arc = d3.svg.arc()
-		    .outerRadius(radius - 10)
-		    .innerRadius(radius - 70);
+		const arc = d3.arc()
+		    .outerRadius(radius)
+		    .innerRadius(radius - thickness);
 
-		const pie = d3.layout.pie()
+		const pie = d3.pie()
 		    .sort(null)
-		    .value(_value );
+		    .value(function(d){
+		    	return d.value;
+		    });
 
 		const svg = d3.select(root)
 			.selectAll('svg')
@@ -31,23 +38,32 @@ function DonutChart(_){
 		.append('g')
 		    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 		 
-	const g = svg.selectAll(".arc")
+	    const g = svg.selectAll(".arc")
 		      .data(pie(data))
 		    .enter().append("g")
 		      .attr("class", "arc");
 
-		  g.append("path")
+		   g.append("path")
 		      .attr("d", arc)
-		      .style("fill", function(d) { return color(d.SOC_TYPE); });
-
-		  g.append("text")
-		      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
-		      .attr("dy", ".35em")
-		      .text(function(d) { return d.SOC_TYPE; });
+		      .style('fill','red');
+		      //.style("fill", function(d) { return color(d.occupation); });
+	
 
 
 
 	}
 
+	/*
+	exports.value = function(fn){
+		if (typeof fn === 'undefined') return _value;
+		_value = fn;
+		return this;
+	}
+	*/
+
+
+	return exports;
+
 }
 export default DonutChart;
+
