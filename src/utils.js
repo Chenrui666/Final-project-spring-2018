@@ -12,3 +12,11 @@ export const parse = d => {
 	};
 }
 
+export const parse2 = d => {
+
+	return {
+		state: d.WORKSITE_STATE
+
+
+	};
+}
