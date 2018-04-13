@@ -6,7 +6,9 @@ export const parse = d => {
 
 	return {
 		occupation: d.SOC_TYPE,
-		state: d.WORKSITE_STATE
+		state: d.WORKSITE_STATE,
+		wage: d.PREVAILING_WAGE,
+		status: d.CASE_STATUS
 
 
 	};

@@ -19,6 +19,8 @@ body, html {
 
 .app_container {
 	height: 1600px;
+  text-align: center;
+  padding: 100px;
 	background-color: wihte;
 }
 
@@ -35,5 +37,5 @@ body, html {
   background-color: rgba(255,255,255,0.1);
   color: #fff;
   padding: 80px;
-  font-size: 72px;
+  font-size: 50px;
 }
