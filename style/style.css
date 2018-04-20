@@ -1,11 +1,23 @@
 
 body, html {
     height: 100%;
+    font-family: 'Roboto', sans-serif;
+}
+
+h2 {
+    font-family: 'Allerta Stencil', sans-serif;
+    font-size:24px;
+}
+.h3otheroccu {
+  color: #5bcaff;
+}
+.h3otherstate {
+  color: #feaa64;
 }
 
 .parallax { 
     /* The image used */
-    background-image: url("../image/passport.jpg");
+    background-image: url("../image/H-1B-visa.jpg");
 
     /* Full height */
     height: 100%; 
@@ -21,7 +33,7 @@ body, html {
 	height: 1600px;
   text-align: center;
   padding: 100px;
-	background-color: wihte;
+	background-color: white;
 }
 
 .caption {
@@ -31,11 +43,54 @@ body, html {
   width: 100%;
   text-align: center;
   color: #000;
+  font-family: 'Allerta Stencil', sans-serif;
 }
 
 .caption span.border {
-  background-color: rgba(255,255,255,0.1);
+  background-color: rgba(0,0,0,0.5);
   color: #fff;
   padding: 80px;
-  font-size: 50px;
+  font-size: 60px;
+}
+
+div.paragraph {
+   width: 80%;
+    display: inline-block; 
+    text-align: left;
+} 
+
+ul {list-style: none}
+
+li::before {content: "•"; color: #5bcaff;
+  display: inline-block; width: 1em;
+  margin-left: -1em}
+
+#other-parent{
+  margin-right:10px;
+    float:left;
+}
+.other-occ{
+  width:40%;
+  display: inline-block;
+   text-align: left;
+    float:left;
+    margin-right:5px;
+}
+
+.other-state{
+    width:40%;
+
+   display: inline-block;
+   text-align: left;
+    float:right;
+    margin-right:5px;
+}
+
+.list-columns {
+-moz-column-count: 2;
+-moz-column-gap: 60px;
+-webkit-column-count: 2;
+-webkit-column-gap: 60px;
+column-count: 2;
+column-gap: 60px;
 }

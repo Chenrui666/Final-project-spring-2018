@@ -11,7 +11,7 @@ import {parse, parse2} from './utils.js';
 
 
 Promise.all([
-  d3.csv('./H-1B_Disclosure_Data_FY17.csv', parse)
+  d3.csv('./Clean_H-1B_Disclosure_Data_FY17.csv', parse)
  ]).then(([H1B, States]) => {
 
 //console.log(H1B);
@@ -40,6 +40,9 @@ const occupationTotals = d3.nest()
 	.key(function(d){
 		return d.occupation;
 	})
+	.key(function(d){
+		return d.state;
+	})
 	.rollup(function(v){
 		return {
 			count:v.length,
@@ -61,13 +64,12 @@ console.log(occupationTotals);
 		const radius = Math.min(width, height) / 5;
 		const radius2 = Math.min(width, height) / 2-10;
 
-		const thickness = 30;
-		const thickness2 = 30;
+		const thickness = 20;
 		const cornerRadius = 10;
 		const padAngle = 0.0015;
 		const arc2Over = d3.arc()
 			.innerRadius(radius2 + 10)
-			.outerRadius(radius2 - thickness2 + 5)
+			.outerRadius(radius2 - thickness + 5)
 			.cornerRadius(cornerRadius)
 		    .padAngle(padAngle);
 
@@ -92,10 +94,14 @@ console.log(occupationTotals);
 		    .padAngle(padAngle);
 
 		const pie1 = d3.pie()
-		    .sort(null)
-		   
-		    .value(function(d){
-		    	return d.value.count;
+		    // .sort(null)
+		   .value(function(d){
+		    	let sum = 0;
+		    	d.values.forEach(function(dd) {
+		    		sum += dd.value.count;
+		    	})
+		    	return sum;
+
 		    });
 
 		const path1 = g1.selectAll('path')
@@ -104,9 +110,8 @@ console.log(occupationTotals);
 				.append('g')
 				.append('path')
 				  .attr('d', arc1)
-				  .attr('fill', function(d,i) { 
-				  	return color(i);
-				  });
+				  // .attr('fill', function(d,i) {return color(i); })
+				  .attr('fill', '#5bcaff');
    				
 				
 
@@ -117,13 +122,14 @@ console.log(occupationTotals);
 			.attr('transform', 'translate(' + (width/2) + ',' + (height/2) + ')');
 
 		const arc2 = d3.arc()
-		    .outerRadius(radius2)
-		    .innerRadius(radius2 - thickness2)
+
+		    .outerRadius(radius2*.75)
+		    .innerRadius(radius2*.75 - thickness)
 		    .cornerRadius(cornerRadius)
 		    .padAngle(padAngle);
 
 		const pie2 = d3.pie()
-		    .sort(null)
+		    // .sort(null)
 		    .value(function(d){
 		    	let sum = 0;
 		    	d.values.forEach(function(dd) {
@@ -133,64 +139,61 @@ console.log(occupationTotals);
 		    	return sum;
 
 		    	// return d.value;
-		    })
+		    });
 		    // .colors(function(d){ return color(d.occupation; });
 
-let changeState = 0;
+		const State = function(){
+			const currentState = arc2;
+			return function(){
+				currentState == arc2 ? arc2Over : arc2;
+				d3.select(this).attr('d', currentState);
+			}
+
+		};
+
+		// const State = (function(){
+		// 	const currentState = 'arc2';
+		// 	return function(){
+		// 		if (currentState === 'arc2'){
+		// 			return currentState == 'arc2Over';
+		// 		}
+		// 		else {return currentState == 'arc2';}
+		// 		d3.select(this).attr('d', currentState);
+		// 	}
+
+		// })();
+
 		const path2 = g2.selectAll('path')
 				.data(pie2(H1BOccupation))
 				.enter()
 				.append('g')
 				.append('path')
 				  .attr('d', arc2)
-				  .attr('fill', function(d,i) { return color(i);})				  
-				  // .attr('stroke', 'white')
-				  // .attr('stroke-width', '3px')
-				  .on('click', function(d){
-
-				  	
-				      d3.select(this).transition()
-				        .duration(100)
-				        .attr("d", arc2Over);
-
-				  	// if(changeState == 0){
-				  	// 	d3.select(this).transition()
-				   //      .duration(200)
-				   //      .attr('d', arc2Over);
-				   //      console.log(changeState);
-				   //      changeState = 1;
-				   //      console.log(changeState);
-				       
-				  	// }
-				  	// else{
-				  	// 	d3.select(this).transition()
-				   //      .duration(200)
-				   //      .attr('d', arc2Over)
-				   //      .transition()
-				   //      .duration(1000)
-				   //      .attr('d', arc2);
-
-				   //      changeState = 0;
-				  	// }
-  
-				      
-
-				      // d3.select('path1')
-				      // .data(pie1(H1BOccupation))
-				      // .attr()
-				    });
-				  // .on('mouseout', function(){
-				  //     d3.select(this).transition()
-				  //       .duration(100)
-				  //       .attr("d", arc2);
-				     
-				    
-				  //   });
-
-			
-
-
-
+				  .attr('fill', '#feaa64');
+				  // .on('click', State);
+				
+	var outerArc = d3.arc()
+                .outerRadius(radius2 * 0.65)
+                .innerRadius(radius2 * 0.65);	
+ function midAngle(d) { return d.startAngle + (d.endAngle - d.startAngle) / 2; }
+var label = g2.selectAll('text')
+                .data(pie2(H1BOccupation))
+              .enter()
+              .append('g').append('text')
+                .attr('dy', '.35em')
+                .style("font-size", "12px")
+                .html(function(d) {
+                    // add "key: value" for given category. Number inside tspan is bolded in stylesheet.
+                    return d.state + ': <tspan>' + d.value + '</tspan>';
+                })
+                .attr("transform", function(d) {  
+    var c = outerArc.centroid(d);
+    return "translate(" + c[0]*1.2 +"," + c[1]*1.2 + ")";
+ })
+                .style('text-anchor', function(d) {
+                    // if slice centre is on the left, anchor text to start, otherwise anchor to end
+                    return (midAngle(d)) < Math.PI ? 'start' : 'end';
+                });
 
 
  });

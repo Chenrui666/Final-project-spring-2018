@@ -5,8 +5,8 @@ import * as d3 from 'd3';
 export const parse = d => {
 
 	return {
-		occupation: d.SOC_TYPE,
-		state: d.WORKSITE_STATE,
+		occupation: d.CLEAN_SOC_TYPE,
+		state: d.CLEAN_WORKSITE_STATE,
 		wage: d.PREVAILING_WAGE,
 		status: d.CASE_STATUS
 
