@@ -12,46 +12,60 @@ import {parse, parse2} from './utils.js';
 
 Promise.all([
   d3.csv('./Clean_H-1B_Disclosure_Data_FY17.csv', parse)
- ]).then(([H1B, States]) => {
+ ]).then(([H1B]) => {
 
-//console.log(H1B);
+const byState = d3.nest()
+  .key(d => d.state)
+  .key(d => d.category)
 
-const H1BOccupation = d3.nest()
-	.key(function(d){
-		return d.state;
-	})
-	// .rollup(function(v){ return v.length})
-	.key(function(d){
-		return d.occupation;
-	})
-	.rollup(function(v){
-		return {
-			count:v.length
-			// sum: d3.sum(v, function(d) { return parseFloat(d.count);})
-		};
-	})
-	.entries(H1B);
-	console.log(H1BOccupation);
+  .rollup(d => d.length)
+  .entries(H1B);
 
+const byStatePie = (d3.pie()
+  .value(state => d3.sum(state.values, d => d.value)))(byState)
+  .map(state => {
+    //A second level of pie layout
+    const pie = d3.pie()
+      .startAngle(state.startAngle)
+      .endAngle(state.endAngle)
+      .value(d => d.value);
+    
+    return {
+      startAngle: state.startAngle,
+      endAngle: state.endAngle,
+      value: state.value,
+      state: state.data.key,
+      values: pie(state.data.values)
+    }
+  })
+  
+const byJob = d3.nest()
+  .key(d => d.category)
+  .key(d => d.state)
 
-const occupationTotals = d3.nest()
+  .rollup(d => d.length)
+  .entries(H1B);
 
-	// .rollup(function(v){ return v.length})
-	.key(function(d){
-		return d.occupation;
-	})
-	.key(function(d){
-		return d.state;
-	})
-	.rollup(function(v){
-		return {
-			count:v.length,
-		};
-	})
-	.entries(H1B);
-console.log(occupationTotals);
+const byJobPie = (d3.pie()
+  .value(cate => d3.sum(cate.values, d => d.value)))(byJob)
+  .map(cate => {
+    //A second level of pie layout
+    const pie = d3.pie()
+      .startAngle(cate.startAngle)
+      .endAngle(cate.endAngle)
+      .value(d => d.value);
+    
+    return {
+      startAngle: cate.startAngle,
+      endAngle: cate.endAngle,
+      value: cate.value,
+      state: cate.data.key,
+      values: pie(cate.data.values)
+    }
+  })
+ console.log(byStatePie);
+  console.log(byJobPie);
 
-// console.log(H1BOccupation);
 
 
 
@@ -95,7 +109,8 @@ console.log(occupationTotals);
 
 		const pie1 = d3.pie()
 		    // .sort(null)
-		   .value(function(d){
+		   
+		     .value(function(d){
 		    	let sum = 0;
 		    	d.values.forEach(function(dd) {
 		    		sum += dd.value.count;
@@ -105,7 +120,7 @@ console.log(occupationTotals);
 		    });
 
 		const path1 = g1.selectAll('path')
-				.data(pie1(occupationTotals))
+				.data(byJobPie)
 				.enter()
 				.append('g')
 				.append('path')
@@ -127,19 +142,21 @@ console.log(occupationTotals);
 		    .innerRadius(radius2*.75 - thickness)
 		    .cornerRadius(cornerRadius)
 		    .padAngle(padAngle);
+		    // .startAngle(function(state) { return state.startAngle; })
+		    // .endAngle(function(state) { return state.endAngle; });
 
-		const pie2 = d3.pie()
-		    // .sort(null)
-		    .value(function(d){
-		    	let sum = 0;
-		    	d.values.forEach(function(dd) {
-		    		sum += dd.value.count;
-		    	})
-		    	// console.log(sum);
-		    	return sum;
+		// const pie2 = d3.pie()
+		//     // .sort(null)
+		//     .value(function(d){
+		//     	let sum = 0;
+		//     	d.values.forEach(function(dd) {
+		//     		sum += dd.value.count;
+		//     	})
+		//     	// console.log(sum);
+		//     	return sum;
 
-		    	// return d.value;
-		    });
+		//     	// return d.value;
+		//     });
 		    // .colors(function(d){ return color(d.occupation; });
 
 		const State = function(){
@@ -150,6 +167,7 @@ console.log(occupationTotals);
 			}
 
 		};
+
 
 		// const State = (function(){
 		// 	const currentState = 'arc2';
@@ -164,20 +182,20 @@ console.log(occupationTotals);
 		// })();
 
 		const path2 = g2.selectAll('path')
-				.data(pie2(H1BOccupation))
+				.data(byStatePie)
 				.enter()
 				.append('g')
 				.append('path')
 				  .attr('d', arc2)
 				  .attr('fill', '#feaa64');
-				  // .on('click', State);
+				  // .on('click',State);
 				
-	var outerArc = d3.arc()
+		const outerArc = d3.arc()
                 .outerRadius(radius2 * 0.65)
                 .innerRadius(radius2 * 0.65);	
- function midAngle(d) { return d.startAngle + (d.endAngle - d.startAngle) / 2; }
-var label = g2.selectAll('text')
-                .data(pie2(H1BOccupation))
+ 		const midAngle = function midAngle(d) { return d.startAngle + (d.endAngle - d.startAngle) / 2; }
+		const label = g2.selectAll('text')
+                .data(byStatePie)
               .enter()
               .append('g').append('text')
                 .attr('dy', '.35em')
@@ -187,14 +205,62 @@ var label = g2.selectAll('text')
                     return d.state + ': <tspan>' + d.value + '</tspan>';
                 })
                 .attr("transform", function(d) {  
-    var c = outerArc.centroid(d);
-    return "translate(" + c[0]*1.2 +"," + c[1]*1.2 + ")";
- })
+  					const c = outerArc.centroid(d);
+    				return "translate(" + c[0]*1.2 +"," + c[1]*1.2 + ")";
+ 				})
                 .style('text-anchor', function(d) {
                     // if slice centre is on the left, anchor text to start, otherwise anchor to end
                     return (midAngle(d)) < Math.PI ? 'start' : 'end';
                 });
 
+
+
+
+var r = 75;
+var theta = 45;
+
+// Convert polar to cartesian
+const x = radius2 * Math.cos(theta);
+const y = radius2 * Math.sin(theta);
+
+
+
+console.log(x,y);
+
+
+		const dotsArc = d3.arc()
+                .outerRadius(radius * 0.65)
+                .innerRadius(radius * 0.65);	
+		const g3 = svg.append('g')
+			.attr('transform', 'translate(' + (width/2) + ',' + (height/2) + ')');
+		const dots = g3.selectAll('circle')
+			.data(byJobPie)
+			.enter()
+			.append('circle')
+			.attr('r', 2)
+			.attr('fill', '#5bcaff')
+			.attr("transform", function(d) {  
+		  					const c = dotsArc.centroid(d);
+		    				return "translate(" + c[0]*1.6 +"," + c[1]*1.6 + ")";
+		 				});
+
+
+		const dotsArcOut = d3.arc()
+                .outerRadius(radius2 * 0.45)
+                .innerRadius(radius2 * 0.45);	
+		const g3Out = svg.append('g')
+			.attr('transform', 'translate(' + (width/2) + ',' + (height/2) + ')');
+		const dotsOut = g3Out.selectAll('circle')
+			.data(byStatePie)
+			.enter()
+			.append('circle')
+			.attr("transform", function(d) {  
+							const Ag = d.startAngle + (d.endAngle-d.startAngle)/2;
+							const x = width/2 + radius2/2*Math.cos(Ag);
+							const y = height/2 + radius2/2*Math.sin(Ag);
+
+		    				return "translate(" + x +"," + y + ")";
+		 				});			
 
  });
 

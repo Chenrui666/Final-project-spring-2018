@@ -5,10 +5,12 @@ import * as d3 from 'd3';
 export const parse = d => {
 
 	return {
-		occupation: d.CLEAN_SOC_TYPE,
 		state: d.CLEAN_WORKSITE_STATE,
-		wage: d.PREVAILING_WAGE,
-		status: d.CASE_STATUS
+ 	    category:d.CLEAN_SOC_TYPE
+		// occupation: d.CLEAN_SOC_TYPE,
+		// state: d.CLEAN_WORKSITE_STATE,
+		// wage: d.PREVAILING_WAGE,
+		// status: d.CASE_STATUS
 
 
 	};
