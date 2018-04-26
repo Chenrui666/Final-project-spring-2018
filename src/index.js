@@ -39,6 +39,10 @@ const byStatePie = (d3.pie()
     }
   })
   
+
+  
+
+
 const byJob = d3.nest()
   .key(d => d.category)
   .key(d => d.state)
@@ -59,14 +63,26 @@ const byJobPie = (d3.pie()
       startAngle: cate.startAngle,
       endAngle: cate.endAngle,
       value: cate.value,
-      state: cate.data.key,
+      category: cate.data.key,
       values: pie(cate.data.values)
     }
   })
- console.log(byStatePie);
-  console.log(byJobPie);
+
+ //console.log(byStatePie);
+  console.log(byJob);
+
+// const testx = byStatePie
+// 	.map(function(d){
+// 	console.log(d);
+	
+// 	return {
+// 		...d.values
+// 	};
+// });
+// console.log(testx);
 
 
+//console.log(testx);
 
 
 	const root = this;
@@ -76,20 +92,28 @@ const byJobPie = (d3.pie()
 		const width = 800;
 		const height = 800;
 		const radius = Math.min(width, height) / 5;
-		const radius2 = Math.min(width, height) / 2-10;
+		const radius2 = Math.min(width, height) / 2;
 
 		const thickness = 20;
 		const cornerRadius = 10;
 		const padAngle = 0.0015;
+
+		const arcOver = d3.arc()
+			.outerRadius(radius + 8)
+			.innerRadius(radius - thickness + 3)
+			.cornerRadius(cornerRadius)
+		    .padAngle(padAngle);
+
 		const arc2Over = d3.arc()
-			.innerRadius(radius2 + 10)
-			.outerRadius(radius2 - thickness + 5)
+			.outerRadius(radius2*.75 + 8)
+			.innerRadius(radius2*.75 - thickness + 3)
 			.cornerRadius(cornerRadius)
 		    .padAngle(padAngle);
 
 
 
 		// const color = d3.scaleOrdinal();
+		const colorSet3 = d3.scaleOrdinal(d3.schemeSet3);
 		const color = d3.scaleOrdinal(["red", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "red","ffb5c5", "pink","cd919e","#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "ffc0cb","ffb5c5", "eea9b8","cd919e","#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "ffc0cb","ffb5c5", "eea9b8","cd919e"]);
 
 		const svg = d3.select('#occupation-distribution')
@@ -126,7 +150,50 @@ const byJobPie = (d3.pie()
 				.append('path')
 				  .attr('d', arc1)
 				  // .attr('fill', function(d,i) {return color(i); })
-				  .attr('fill', '#5bcaff');
+				  .attr('fill', '#5bcaff')
+				  .on("mouseover", function(d){
+  console.log(d);
+				      d3.select(this).transition()
+				        .duration(200)
+				        .attr("d", arcOver)
+				        .style("fill", "#01a7fb");
+
+				  		let pieData = d.values;
+				  		console.log(pieData);
+				  		
+let thisJobPie = d3.pie()
+  .value(function(dd) { return dd.data.value; });
+
+console.log(thisJobPie);
+
+						gh.selectAll('path').data(thisJobPie(pieData))
+							.enter()
+							.append('g')
+							.append('path')
+							  .attr('d', arch)
+							  .attr('fill', function(d,i) {return colorSet3(i); })
+							  .exit().remove();
+
+						// pathh.exit().remove();
+						// byJob.forEach(function(b) {
+						// 	if(d.category === b.key) {
+						// 		pieData = b.values;
+						// 	} 
+						// 	// let vals = d.values;
+						// 	// console.log(vals);
+						// });
+						// console.log(pieData);
+
+				  }).on("mouseout", function(){
+
+				  	gh.selectAll('path').remove();
+				      d3.select(this).transition()
+				        .duration(100)
+				        .attr("d", arc1)
+				   		.style("fill", '#5bcaff');
+				    
+				    });
+
    				
 				
 
@@ -187,9 +254,51 @@ const byJobPie = (d3.pie()
 				.append('g')
 				.append('path')
 				  .attr('d', arc2)
-				  .attr('fill', '#feaa64');
-				  // .on('click',State);
-				
+				  .attr('fill', '#feaa64')
+				  .on("mouseover", function(d){
+  
+				      d3.select(this).transition()
+				        .duration(200)
+				        .attr("d", arc2Over)
+				        .style("fill", "#ef810a");
+				  }).on("mouseout", function(){
+				      d3.select(this).transition()
+				        .duration(100)
+				        .attr("d", arc2)
+				   		.style("fill", '#feaa64');
+				    
+				    });
+
+///////////the hover pies//////////
+const gh = svg.append('g')
+			.attr('transform', 'translate(' + (width/2) + ',' + (height/2) + ')');
+
+		const arch = d3.arc()
+		    .outerRadius(radius/2)
+		    .innerRadius(0)
+		    .padAngle(padAngle);
+
+		const pieh = d3.pie()
+		    // .sort(null)
+		   
+		     .value(function(d){
+		    	let sum = 0;
+		    	d.values.forEach(function(dd) {
+		    		sum += dd.value.count;
+		    	})
+		    	return sum;
+
+		    });
+
+		// const pathh = gh.selectAll('path')
+		// 		.data(byJobPie)
+		// 		.enter()
+		// 		.append('g')
+		// 		.append('path')
+		// 		  .attr('d', arch)
+		// 		  .attr('fill', function(d,i) {return colorSet3(i); })
+		
+//////////////////////the outer labels////////////////////
 		const outerArc = d3.arc()
                 .outerRadius(radius2 * 0.65)
                 .innerRadius(radius2 * 0.65);	
@@ -200,9 +309,12 @@ const byJobPie = (d3.pie()
               .append('g').append('text')
                 .attr('dy', '.35em')
                 .style("font-size", "12px")
-                .html(function(d) {
-                    // add "key: value" for given category. Number inside tspan is bolded in stylesheet.
-                    return d.state + ': <tspan>' + d.value + '</tspan>';
+                
+
+                .html(function(d,error) {
+                    if (d.value < 150) {return null}
+                    	else
+                    {return d.state + ': <tspan>' + d.value + '</tspan>'};
                 })
                 .attr("transform", function(d) {  
   					const c = outerArc.centroid(d);
@@ -213,54 +325,126 @@ const byJobPie = (d3.pie()
                     return (midAngle(d)) < Math.PI ? 'start' : 'end';
                 });
 
+//////////////////////the inner labels////////////////////
+		const occuArc = d3.arc()
+                .outerRadius(radius * 0.7)
+                .innerRadius(radius * 0.7);	
+		const occuLabel = g1.selectAll('text')
+                .data(byJobPie)
+              .enter()
+              .append('g').append('text')
+                .attr('dy', '.35em')
+                .style('font-size', '12px')
+                
+
+                // .html(function(d) {
+                // 	return wr
+                //     return d.category + ': <tspan>' + d.value + '</tspan>';
+                // })
+                .attr("transform", function(d) {  
+  					const c = occuArc.centroid(d);
+    				return "translate(" + c[0]*1.5 +"," + c[1]*1.5 + ")";
+ 				})
+                .style('text-anchor', function(d) {
+                    // if slice centre is on the left, anchor text to start, otherwise anchor to end
+                    return (midAngle(d)) < Math.PI ? 'start' : 'end';
+                })
+                .text(function(d) { return d.category; })
+                // .selectAll('text')
+                .call(wrap, '200');
 
 
 
-var r = 75;
-var theta = 45;
 
-// Convert polar to cartesian
-const x = radius2 * Math.cos(theta);
-const y = radius2 * Math.sin(theta);
+function wrap(textG, width) {
+console.log(width);
+  textG.each(function() {
+    var text = d3.select(this),
+        words = text.text().split(/\s+/).reverse(),
+        word,
+        line = [],
+        lineNumber = 0,
+        lineHeight = 1.1, // ems
+        y = text.attr("y"),
+        dy = parseFloat(text.attr("dy")),
+        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em")
+
+    while (word = words.pop()) {
+    	console.log(word)
+      line.push(word)
+      tspan.text(line.join(" "))
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop()
+        tspan.text(line.join(" "))
+        line = [word]
+        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", `${++lineNumber * lineHeight + dy}em`).text(word)
+      }
+    }
+  })
+}
+
+
+// var getAngle = function (d) {
+//     return (180 / Math.PI * (d.startAngle + d.endAngle) / 2 - 90);
+// };
+
+// const label = g2.selectAll('text')
+//                 .data(byStatePie)
+//               .enter()
+//               .append('g').append("text")
+//               .style("font-size", "10px")
+//     .attr("transform", function(d) { 
+//             return "translate(" + outerArc.centroid(d) + ") " +
+//                     "rotate(" + getAngle(d) + ")"; }) 
+//     .attr("dy", 5) 
+//     .style("text-anchor", "start")
+//     .text(function(d) { return d.state + d.value ; });
+
+
+// var r = 75;
+// var theta = 45;
+
+// // Convert polar to cartesian
+// const x = radius2 * Math.cos(theta);
+// const y = radius2 * Math.sin(theta);
 
 
 
-console.log(x,y);
+// console.log(x,y);
+
+////////////////////////////dots for occupation///////////////
+		// const dotsArc = d3.arc()
+  //               .outerRadius(radius * 0.65)
+  //               .innerRadius(radius * 0.65);	
+		// const g3 = svg.append('g')
+		// 	.attr('transform', 'translate(' + (width/2) + ',' + (height/2) + ')');
+		// const dots = g3.selectAll('circle')
+		// 	.data(byJobPie)
+		// 	.enter()
+		// 	.append('circle')
+		// 	.attr('r', 2)
+		// 	.attr('fill', '#5bcaff')
+		// 	.attr("transform", function(d) {  
+		//   					const c = dotsArc.centroid(d);
+		//     				return "translate(" + c[0]*1.6 +"," + c[1]*1.6 + ")";
+		//  				});
 
 
-		const dotsArc = d3.arc()
-                .outerRadius(radius * 0.65)
-                .innerRadius(radius * 0.65);	
-		const g3 = svg.append('g')
-			.attr('transform', 'translate(' + (width/2) + ',' + (height/2) + ')');
-		const dots = g3.selectAll('circle')
-			.data(byJobPie)
-			.enter()
-			.append('circle')
-			.attr('r', 2)
-			.attr('fill', '#5bcaff')
-			.attr("transform", function(d) {  
-		  					const c = dotsArc.centroid(d);
-		    				return "translate(" + c[0]*1.6 +"," + c[1]*1.6 + ")";
-		 				});
+		
 
 
-		const dotsArcOut = d3.arc()
-                .outerRadius(radius2 * 0.45)
-                .innerRadius(radius2 * 0.45);	
-		const g3Out = svg.append('g')
-			.attr('transform', 'translate(' + (width/2) + ',' + (height/2) + ')');
-		const dotsOut = g3Out.selectAll('circle')
-			.data(byStatePie)
-			.enter()
-			.append('circle')
-			.attr("transform", function(d) {  
-							const Ag = d.startAngle + (d.endAngle-d.startAngle)/2;
-							const x = width/2 + radius2/2*Math.cos(Ag);
-							const y = height/2 + radius2/2*Math.sin(Ag);
 
-		    				return "translate(" + x +"," + y + ")";
-		 				});			
+			// .attr("transform", function(d) {  
+
+			// 				const Ag = d.values.startAngle + (d.values.endAngle-d.values.startAngle)/2;
+			// 				const x = width/2 + radius2/2*Math.cos(Ag);
+			// 				const y = height/2 + radius2/2*Math.sin(Ag);
+
+		 //    				return "translate(" + x +"," + y + ")";
+		 // 
+
+
+		 
 
  });
 
