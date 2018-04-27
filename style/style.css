@@ -1,12 +1,24 @@
 
 body, html {
     height: 100%;
+    width: 100%;
     font-family: 'Roboto', sans-serif;
 }
 
 h2 {
     font-family: 'Allerta Stencil', sans-serif;
-    font-size:24px;
+    font-size:40px;
+    color: #808080;
+    line-height: 60px;
+
+}
+footer {
+    padding: 1em;
+    color: white;
+background-image: url("../image/H-1B-visa.jpg");
+    clear: left;
+    text-align: center;
+    height: 3%;
 }
 .h3otheroccu {
   color: #5bcaff;
@@ -30,12 +42,31 @@ h2 {
 }
 
 .app_container {
-	height: 1600px;
+	height: 100%;
   text-align: center;
-  padding: 50px;
-	background-color: white;
+/*  padding: 50px;
+*/	background-color: white;
 }
 
+#occupation-distribution{
+  width:60%;
+  display: inline-block;
+/*   text-align: left;
+*/    float:left;
+/*    margin-right:5px;
+
+*/
+}
+#chartUsage{
+  width:25%;
+  margin-top: 140px;
+
+   display: inline-block;
+   text-align: left;
+    float:left;
+/*    margin-right:5px;
+*/
+}
 .caption {
   position: absolute;
   left: 0;
@@ -57,14 +88,15 @@ div.paragraph {
    width: 80%;
     display: inline-block; 
     text-align: left;
+    line-height: 28px;
 } 
 
-ul {list-style: none}
+/*ul {list-style: none}
 
 li::before {content: "•"; color: #5bcaff;
   display: inline-block; width: 1em;
   margin-left: -1em}
-
+*/
 #other-parent{
   margin-right:10px;
     float:left;
@@ -93,4 +125,14 @@ li::before {content: "•"; color: #5bcaff;
 -webkit-column-gap: 60px;
 column-count: 2;
 column-gap: 60px;
+}
+
+.footer {
+ 
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1rem;
+  background-color: #efefef;
+  text-align: center;
 }

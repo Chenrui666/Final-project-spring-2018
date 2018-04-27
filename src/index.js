@@ -5,7 +5,6 @@ import '../style/style.css';
 
 import {parse, parse2} from './utils.js';
 
-// import DonutChart from './DonutChart';
 
 
 
@@ -68,21 +67,7 @@ const byJobPie = (d3.pie()
     }
   })
 
- //console.log(byStatePie);
-  console.log(byJob);
-
-// const testx = byStatePie
-// 	.map(function(d){
-// 	console.log(d);
-	
-// 	return {
-// 		...d.values
-// 	};
-// });
-// console.log(testx);
-
-
-//console.log(testx);
+ 
 
 
 	const root = this;
@@ -91,10 +76,11 @@ const byJobPie = (d3.pie()
 
 		const width = 800;
 		const height = 800;
-		const radius = Math.min(width, height) / 5;
+		const radius = Math.min(width, height) / 3.2;
 		const radius2 = Math.min(width, height) / 2;
 
-		const thickness = 20;
+		const thickness = 30;
+		const thickness2 = 60;
 		const cornerRadius = 10;
 		const padAngle = 0.0015;
 
@@ -114,15 +100,22 @@ const byJobPie = (d3.pie()
 
 		// const color = d3.scaleOrdinal();
 		const colorSet3 = d3.scaleOrdinal(d3.schemeSet3);
-		const color = d3.scaleOrdinal(["red", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "red","ffb5c5", "pink","cd919e","#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "ffc0cb","ffb5c5", "eea9b8","cd919e","#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "ffc0cb","ffb5c5", "eea9b8","cd919e"]);
-
+		// const color = d3.scaleOrdinal(["red", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "red","ffb5c5", "pink","cd919e","#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "ffc0cb","ffb5c5", "eea9b8","cd919e","#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "ffc0cb","ffb5c5", "eea9b8","cd919e"]);
+		
 		const svg = d3.select('#occupation-distribution')
-			.append('svg')
-			.attr('class', 'pie')
-			.attr('width', width)
-			.attr('height', height);
+			.selectAll('svg')
+			.data([1]); 
+		const svgEnter = svg.enter().append('svg')
+			.attr('width',width)
+			.attr('height',height);
+		svgEnter.append('g').attr('class','plot')
 
-		const g1 = svg.append('g')
+		const plot = svg.merge(svgEnter)
+			.select('.plot');
+		
+
+////////////////////////////occupation dunut/////inner////////////////////
+		const g1 = plot.append('g')
 			.attr('transform', 'translate(' + (width/2) + ',' + (height/2) + ')');
 
 		const arc1 = d3.arc()
@@ -131,17 +124,17 @@ const byJobPie = (d3.pie()
 		    .cornerRadius(cornerRadius)
 		    .padAngle(padAngle);
 
-		const pie1 = d3.pie()
-		    // .sort(null)
+		// const pie1 = d3.pie()
+		//     // .sort(null)
 		   
-		     .value(function(d){
-		    	let sum = 0;
-		    	d.values.forEach(function(dd) {
-		    		sum += dd.value.count;
-		    	})
-		    	return sum;
+		//      .value(function(d){
+		//     	let sum = 0;
+		//     	d.values.forEach(function(dd) {
+		//     		sum += dd.value.count;
+		//     	})
+		//     	return sum;
 
-		    });
+		//     });
 
 		const path1 = g1.selectAll('path')
 				.data(byJobPie)
@@ -149,58 +142,88 @@ const byJobPie = (d3.pie()
 				.append('g')
 				.append('path')
 				  .attr('d', arc1)
-				  // .attr('fill', function(d,i) {return color(i); })
 				  .attr('fill', '#5bcaff')
 				  .on("mouseover", function(d){
-  console.log(d);
 				      d3.select(this).transition()
 				        .duration(200)
 				        .attr("d", arcOver)
 				        .style("fill", "#01a7fb");
 
-				  		let pieData = d.values;
-				  		console.log(pieData);
+				    let pieData = d.values;
 				  		
-let thisJobPie = d3.pie()
-  .value(function(dd) { return dd.data.value; });
+					let thisJobPie = d3.pie()
+						// .sort(null)
+  						.value(function(dd) { return dd.data.value; });
 
-console.log(thisJobPie);
 
-						gh.selectAll('path').data(thisJobPie(pieData))
-							.enter()
-							.append('g')
-							.append('path')
-							  .attr('d', arch)
-							  .attr('fill', function(d,i) {return colorSet3(i); })
-							  .exit().remove();
+					gh.selectAll('path').data(thisJobPie(pieData))
+						.attr('class', '.hoverPie')
+						.enter()
+						.append('g')
+						.append('path')
+						  .attr('d', arch)
+						  .attr('fill', function(d,i) {return colorSet3(i); });
+						
 
-						// pathh.exit().remove();
-						// byJob.forEach(function(b) {
-						// 	if(d.category === b.key) {
-						// 		pieData = b.values;
-						// 	} 
-						// 	// let vals = d.values;
-						// 	// console.log(vals);
-						// });
-						// console.log(pieData);
 
-				  }).on("mouseout", function(){
+							  textTop.text(d.category)
+							  .call(wrap, 220);
+							  textBottom.text(d.value);
+
+
+					gh.selectAll('text')
+					.attr('class', '.hoverLabel')
+
+		                .data(thisJobPie(pieData))
+		              .enter()
+		              .append('g').append('text')
+		                .attr('dy', '.35em')
+		                .style("font-size", "12px")
+		                
+					.text(function(d) {
+						console.log(d);
+						const standard = d.endAngle-d.startAngle;
+						// console.log(standard);
+		                    if (standard < 0.07) {return null}
+		                    	else
+		                    {return d.data.data.key };
+            	    })
+		                // .text(function(d){return d.value})
+		                .attr("transform", function(d) {  
+		  					const c = outerArc.centroid(d);
+		    				return "translate(" + c[0]*.7 +"," + c[1]*.7 + ")";
+		 				})
+		                .style('text-anchor', function(d) {
+		                    return (midAngle(d)) < Math.PI ? 'start' : 'end';
+		                });
+
+
+
+
+
+                              
+				  })
+
+				 .on("mouseout", function(){
 
 				  	gh.selectAll('path').remove();
+				  	gh.selectAll('text').remove();
 				      d3.select(this).transition()
 				        .duration(100)
 				        .attr("d", arc1)
 				   		.style("fill", '#5bcaff');
+
+				   		textTop.text('Hover over the slices to see the detail');
+     					textBottom.text(null);
 				    
 				    });
 
-   				
 				
 
            
 
-	//the outer states donut
-		const g2 = svg.append('g')
+	//////////////////////////the outer states donut/////////////////////
+		const g2 = plot.append('g')
 			.attr('transform', 'translate(' + (width/2) + ',' + (height/2) + ')');
 
 		const arc2 = d3.arc()
@@ -209,44 +232,7 @@ console.log(thisJobPie);
 		    .innerRadius(radius2*.75 - thickness)
 		    .cornerRadius(cornerRadius)
 		    .padAngle(padAngle);
-		    // .startAngle(function(state) { return state.startAngle; })
-		    // .endAngle(function(state) { return state.endAngle; });
-
-		// const pie2 = d3.pie()
-		//     // .sort(null)
-		//     .value(function(d){
-		//     	let sum = 0;
-		//     	d.values.forEach(function(dd) {
-		//     		sum += dd.value.count;
-		//     	})
-		//     	// console.log(sum);
-		//     	return sum;
-
-		//     	// return d.value;
-		//     });
-		    // .colors(function(d){ return color(d.occupation; });
-
-		const State = function(){
-			const currentState = arc2;
-			return function(){
-				currentState == arc2 ? arc2Over : arc2;
-				d3.select(this).attr('d', currentState);
-			}
-
-		};
-
-
-		// const State = (function(){
-		// 	const currentState = 'arc2';
-		// 	return function(){
-		// 		if (currentState === 'arc2'){
-		// 			return currentState == 'arc2Over';
-		// 		}
-		// 		else {return currentState == 'arc2';}
-		// 		d3.select(this).attr('d', currentState);
-		// 	}
-
-		// })();
+		    
 
 		const path2 = g2.selectAll('path')
 				.data(byStatePie)
@@ -261,127 +247,218 @@ console.log(thisJobPie);
 				        .duration(200)
 				        .attr("d", arc2Over)
 				        .style("fill", "#ef810a");
-				  }).on("mouseout", function(){
+
+				        let pieData = d.values;
+				  		
+					let thisJobPie = d3.pie()
+						// .sort(null)
+  						.value(function(dd) { return dd.data.value; });
+
+
+					gh.selectAll('path').data(thisJobPie(pieData))
+						.attr('class', '.hoverPie')
+						.enter()
+						.append('g')
+						.append('path')
+						  .attr('d', arch)
+						  .attr('fill', function(d,i) {return colorSet3(i); });
+						
+
+
+							  textTop.text(d.state)
+							  .call(wrap, 220);
+							  textBottom.text(d.value);
+
+
+
+
+					gh.selectAll('text')
+					.attr('class', '.hoverLabel')
+
+		                .data(thisJobPie(pieData))
+		              .enter()
+		              .append('g').append('text')
+		                .attr('dy', '.35em')
+		                .style("font-size", "12px")
+		                
+						.text(function(d) {
+							const standard = d.endAngle-d.startAngle;
+			                    if (standard < 0.3) {return null}
+			                    	else
+			                    {return d.data.data.key };
+	            	    })
+		                .attr("transform", function(d) {  
+		  					const c = outerArc.centroid(d);
+		    				return "translate(" + c[0]*.5 +"," + c[1]*.5 + ")";
+		 				})
+		                .style('text-anchor', function(d) {
+		                    return (midAngle(d)) < Math.PI ? 'start' : 'end';
+		                })
+		                .call(wrapForOccu, 140);
+
+
+				  })
+
+
+				  .on("mouseout", function(){
 				      d3.select(this).transition()
 				        .duration(100)
 				        .attr("d", arc2)
 				   		.style("fill", '#feaa64');
+
+
+				   	gh.selectAll('path').remove();
+				   	gh.selectAll('text').remove();
+
+				      
+				     
+
+			   		textTop.text('Hover over the slices to see the detail');
+ 					textBottom.text(null);
+				    
 				    
 				    });
 
 ///////////the hover pies//////////
-const gh = svg.append('g')
+		const gh = plot.append('g')
 			.attr('transform', 'translate(' + (width/2) + ',' + (height/2) + ')');
 
 		const arch = d3.arc()
-		    .outerRadius(radius/2)
-		    .innerRadius(0)
-		    .padAngle(padAngle);
+		    .outerRadius(radius*.7)
+		    .innerRadius(radius*.7 - thickness2)
+		    .padAngle(padAngle*2);
 
-		const pieh = d3.pie()
-		    // .sort(null)
-		   
-		     .value(function(d){
-		    	let sum = 0;
-		    	d.values.forEach(function(dd) {
-		    		sum += dd.value.count;
-		    	})
-		    	return sum;
+		const textTop = plot.append('text')
+			 .attr("dy", ".35em")
+	 		 .style("text-anchor", "middle")
+	   		 .attr("font-size", '18px')
+		     .attr("fill", "black")
+	         .attr("x", width / 2)
+	    	 .attr("y", height/ 2 - 28)
+	    	 .text('Hover over the slices to see the detail');
 
-		    });
+		const textBottom = plot.append('text')
+			 .attr("dy", ".35em")
+	 		 .style("text-anchor", "middle")
+	   		 .attr("font-size", '25px')
+		     .attr("fill", "black")
+	         .attr("x", width / 2)
+	    	 .attr("y", height/ 2+ 36);
 
-		// const pathh = gh.selectAll('path')
-		// 		.data(byJobPie)
-		// 		.enter()
-		// 		.append('g')
-		// 		.append('path')
-		// 		  .attr('d', arch)
-		// 		  .attr('fill', function(d,i) {return colorSet3(i); })
 		
 //////////////////////the outer labels////////////////////
 		const outerArc = d3.arc()
                 .outerRadius(radius2 * 0.65)
                 .innerRadius(radius2 * 0.65);	
  		const midAngle = function midAngle(d) { return d.startAngle + (d.endAngle - d.startAngle) / 2; }
-		const label = g2.selectAll('text')
-                .data(byStatePie)
-              .enter()
-              .append('g').append('text')
-                .attr('dy', '.35em')
-                .style("font-size", "12px")
+		// const label = g2.selectAll('text')
+  //               .data(byStatePie)
+  //             .enter()
+  //             .append('g').append('text')
+  //               .attr('dy', '.35em')
+  //               .style("font-size", "12px")
                 
 
-                .html(function(d,error) {
-                    if (d.value < 150) {return null}
-                    	else
-                    {return d.state + ': <tspan>' + d.value + '</tspan>'};
-                })
-                .attr("transform", function(d) {  
-  					const c = outerArc.centroid(d);
-    				return "translate(" + c[0]*1.2 +"," + c[1]*1.2 + ")";
- 				})
-                .style('text-anchor', function(d) {
-                    // if slice centre is on the left, anchor text to start, otherwise anchor to end
-                    return (midAngle(d)) < Math.PI ? 'start' : 'end';
-                });
+  //               .html(function(d,error) {
+  //                   if (d.value < 150) {return null}
+  //                   	else
+  //                   {return d.state + ': <tspan>' + d.value + '</tspan>'};
+  //               })
+  //               .attr("transform", function(d) {  
+  // 					const c = outerArc.centroid(d);
+  //   				return "translate(" + c[0]*1.2 +"," + c[1]*1.2 + ")";
+ 	// 			})
+  //               .style('text-anchor', function(d) {
+  //                   // if slice centre is on the left, anchor text to start, otherwise anchor to end
+  //                   return (midAngle(d)) < Math.PI ? 'start' : 'end';
+  //               });
 
 //////////////////////the inner labels////////////////////
-		const occuArc = d3.arc()
-                .outerRadius(radius * 0.7)
-                .innerRadius(radius * 0.7);	
-		const occuLabel = g1.selectAll('text')
-                .data(byJobPie)
-              .enter()
-              .append('g').append('text')
-                .attr('dy', '.35em')
-                .style('font-size', '12px')
+		// const occuArc = d3.arc()
+  //               .outerRadius(radius * 0.7)
+  //               .innerRadius(radius * 0.7);	
+		// const occuLabel = g1.selectAll('text')
+  //               .data(byJobPie)
+  //             .enter()
+  //             .append('g').append('text')
+  //               .attr('dy', '.35em')
+  //               .style('font-size', '12px')
                 
 
-                // .html(function(d) {
-                // 	return wr
-                //     return d.category + ': <tspan>' + d.value + '</tspan>';
-                // })
-                .attr("transform", function(d) {  
-  					const c = occuArc.centroid(d);
-    				return "translate(" + c[0]*1.5 +"," + c[1]*1.5 + ")";
- 				})
-                .style('text-anchor', function(d) {
-                    // if slice centre is on the left, anchor text to start, otherwise anchor to end
-                    return (midAngle(d)) < Math.PI ? 'start' : 'end';
-                })
-                .text(function(d) { return d.category; })
-                // .selectAll('text')
-                .call(wrap, '200');
+  //               // .html(function(d) {
+  //               // 	return wr
+  //               //     return d.category + ': <tspan>' + d.value + '</tspan>';
+  //               // })
+  //               .attr("transform", function(d) {  
+  // 					const c = occuArc.centroid(d);
+  //   				return "translate(" + c[0]*1.5 +"," + c[1]*1.5 + ")";
+ 	// 			})
+  //               .style('text-anchor', function(d) {
+  //                   // if slice centre is on the left, anchor text to start, otherwise anchor to end
+  //                   return (midAngle(d)) < Math.PI ? 'start' : 'end';
+  //               })
+  //               .text(function(d) { return d.category; })
+  //               .selectAll('text')
+  //               .call(wrap, '200');
 
 
 
+////////////////////////wrapping text function////////perfectly working///////////////////
+				function wrap(textG, width) {
+				  textG.each(function() {
+				    var text = d3.select(this),
+				        words = text.text().split(/\s+/).reverse(),
+				        word,
+				        line = [],
+				        lineNumber = 0,
+				        lineHeight = 1.1, // ems
+				        x= text.attr('x'),
+				        y = text.attr("y"),
+				        dy = parseFloat(text.attr("dy")),
+				        tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em")
 
-function wrap(textG, width) {
-console.log(width);
-  textG.each(function() {
-    var text = d3.select(this),
-        words = text.text().split(/\s+/).reverse(),
-        word,
-        line = [],
-        lineNumber = 0,
-        lineHeight = 1.1, // ems
-        y = text.attr("y"),
-        dy = parseFloat(text.attr("dy")),
-        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em")
+				    while (word = words.pop()) {
+				      line.push(word)
+				      tspan.text(line.join(" "))
+				      if (tspan.node().getComputedTextLength() > width) {
+				        line.pop()
+				        tspan.text(line.join(" "))
+				        line = [word]
+				        tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", `${++lineNumber * lineHeight + dy}em`).text(word)
+				      }
+				    }
+				  })
+				}
 
-    while (word = words.pop()) {
-    	console.log(word)
-      line.push(word)
-      tspan.text(line.join(" "))
-      if (tspan.node().getComputedTextLength() > width) {
-        line.pop()
-        tspan.text(line.join(" "))
-        line = [word]
-        tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", `${++lineNumber * lineHeight + dy}em`).text(word)
-      }
-    }
-  })
-}
+
+
+				function wrapForOccu(textG, width) {
+				  textG.each(function() {
+				    var text = d3.select(this),
+				        words = text.text().split(/\s+/).reverse(),
+				        word,
+				        line = [],
+				        lineNumber = 0,
+				        lineHeight = 1.1, // ems
+				        x= text.attr('x'),
+				        y = text.attr("y"),
+				        dy = parseFloat(text.attr("dy")),
+				        tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em")
+
+				    while (word = words.pop()) {
+				      line.push(word)
+				      tspan.text(line.join(" "))
+				      if (tspan.node().getComputedTextLength() > width) {
+				        line.pop()
+				        tspan.text(line.join(" "))
+				        line = [word]
+				        tspan = text.append("tspan").attr("x", 0).attr("y", `${++lineNumber * lineHeight + y}`).attr("dy", `${++lineNumber * 0.5 + dy}em`).text(word)
+				      }
+				    }
+				  })
+				}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 
 
 // var getAngle = function (d) {
